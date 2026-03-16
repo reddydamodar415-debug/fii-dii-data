@@ -171,8 +171,6 @@ tr:last-child td { border-bottom: none; }
 .mb-bull { background: rgba(0, 208, 158, 0.15); color: var(--green); border: 1px solid rgba(0, 208, 158, 0.3); }
 .mb-bear { background: rgba(251, 54, 64, 0.15); color: var(--red); border: 1px solid rgba(251, 54, 64, 0.3); }
 .mb-neut { background: rgba(240, 237, 229, 0.1); color: var(--t2); border: 1px solid rgba(240, 237, 229, 0.2); }
-.mb-neut { background: rgba(240, 237, 229, 0.1); color: var(--t2); border: 1px solid rgba(240, 237, 229, 0.2); }
-.mb-neut { background: rgba(240, 237, 229, 0.1); color: var(--t2); border: 1px solid rgba(240, 237, 229, 0.2); }
 .btn-x { background: var(--l2); border: 1px solid var(--sep); color: var(--t1); padding: 0 16px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; height: 32px; }
 .btn-x:hover { border-color: var(--t3); background: var(--l3); }
 .btn-primary { background: var(--blue); border: none; color: var(--bg); padding: 0 16px; border-radius: 20px; font-size: 12px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(10, 209, 166, 0.2); transition: transform 0.2s, background 0.3s, color 0.3s; height: 32px; }
@@ -244,7 +242,7 @@ tr:last-child td { border-bottom: none; }
           <div class="c-title" style="color:var(--blue); font-size:18px;">Latest Extracted Session</div>
           <div class="c-sub" id="lDate" style="font-size:14px;">Friday, 13 March 2026</div>
         </div>
-        <div class="mom-badge mb-bear">Aggressive Selling</div>
+        <div class="mom-badge mb-bear" id="heroBadge">Aggressive Selling</div>
       </div>
       
       <div style="display:flex; justify-content:space-between; margin-top:32px; align-items:flex-end;">
@@ -271,7 +269,7 @@ tr:last-child td { border-bottom: none; }
       </div>
       
       <div style="margin-top:24px; background:var(--bg); border-radius:12px; padding:16px 20px; display:flex; justify-content:space-between; align-items:center; border:1px solid var(--sep2);">
-        <span style="font-size:13px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:0.5px;">Combined Liquidity Drain</span>
+        <span id="liqLabel" style="font-size:13px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:0.5px;">Combined Liquidity</span>
         <span class="num-s t-red" id="lNet" style="font-size:20px;">-₹747 Cr</span>
       </div>
     </div>
@@ -289,12 +287,12 @@ tr:last-child td { border-bottom: none; }
             <div class="c-sub" style="margin-bottom:4px; margin-top:0;">Current FII Streak</div>
             <div style="display:flex; align-items:center; gap:8px;">
                <div class="status-dot" style="background:var(--red); box-shadow:0 0 8px var(--red);" id="streak-dot"></div>
-               <div class="num-m t-red" id="streak-val">5 Days Selling</div>
+               <div class="num-m t-red" id="streak-val">—</div>
             </div>
           </div>
           <div style="text-align:right;">
              <div class="c-sub" style="margin-bottom:4px; margin-top:0;">Streak Velocity</div>
-             <div class="num-s t-red" id="streak-vol">-₹14,500 Cr</div>
+             <div class="num-s t-red" id="streak-vol">—</div>
           </div>
         </div>
       </div>
@@ -303,8 +301,8 @@ tr:last-child td { border-bottom: none; }
       <div class="card" id="mom-card" style="flex:1;">
         <button class="cam-btn" onclick="exportDOM(this.parentNode, 'Momentum')">📷</button>
         <div class="c-sub" style="margin-bottom:12px;">5-Day FII Net Velocity</div>
-        <div class="num-m t-red" style="margin-bottom:8px;">-₹31,043 Cr</div>
-        <div style="font-size:12px; color:var(--t3); line-height:1.5;">Average daily selling rate has spiked to <strong>₹6,208 Cr/day</strong> over the last 5 sessions, deeply negative momentum.</div>
+        <div class="num-m t-red" id="vel5d" style="margin-bottom:8px;">—</div>
+        <div id="vel5dDesc" style="font-size:12px; color:var(--t3); line-height:1.5;">Computing…</div>
       </div>
       <!-- Ticker -->
       <div class="card" id="tk-card" style="background:var(--l1);">
@@ -321,6 +319,7 @@ tr:last-child td { border-bottom: none; }
             <div class="t-red" style="font-size:13px; font-weight:600;">+5.23%</div>
           </div>
         </div>
+        <div style="font-size:10px; color:var(--t4); margin-top:10px; text-align:center;" id="tkDate">As of Mar 13 close · Updates with live sync</div>
       </div>
     </div>
   </div>
@@ -723,6 +722,7 @@ function switchSubTab(id) {
 
 /* ── DATASETS ── */
 const dailyData = [
+  { d:"16-Mar-2026", fb:10900, fs:20266, fn:-9366, db:25150, ds:12557, dn:12593 },
   { d:"13-Mar-2026", fb:11923, fs:22647, fn:-10724, db:22707, ds:12730, dn:9977 },
   { d:"12-Mar-2026", fb:14201, fs:16122, fn:-1921, db:18402, ds:13201, dn:5201 },
   { d:"11-Mar-2026", fb:18420, fs:15201, fn:3219,  db:12101, ds:15402, dn:-3301 },
@@ -741,6 +741,7 @@ const dailyData = [
 ];
 
 const weeklyData = [
+  { w:"Wk Mar 16*", fn:-9366, dn:12593 },
   { w:"Wk Mar 13", fn:-22905, dn:26097 }, { w:"Wk Mar 06", fn:-20399, dn:22099 },
   { w:"Wk Feb 27", fn:-18602, dn:22519 }, { w:"Wk Feb 20", fn:-11204, dn:16402 },
   { w:"Wk Feb 13", fn:+4201,  dn:-1202 },  { w:"Wk Feb 06", fn:-14201, dn:15003 },
@@ -749,7 +750,7 @@ const weeklyData = [
 ];
 
 const monthlyData = [
-  { m:"Mar 2026*", fn:-29825, dn:15391, nc:"-2.1%" }, { m:"Feb 2026",  fn:-12240, dn:57471, nc:"+1.2%" },
+  { m:"Mar 2026*", fn:-39191, dn:27984, nc:"-2.1%" }, { m:"Feb 2026",  fn:-12240, dn:57471, nc:"+1.2%" },
   { m:"Jan 2026",  fn:-87374, dn:105309,nc:"-3.4%" }, { m:"Dec 2025",  fn:-21402, dn:38401, nc:"+4.1%" },
   { m:"Nov 2025",  fn:-42101, dn:51201, nc:"-1.2%" }, { m:"Oct 2025",  fn:-114402,dn:121002,nc:"-6.2%" },
   { m:"Sep 2025",  fn:+15401, dn:35201, nc:"+3.2%" }, { m:"Aug 2025",  fn:-18402, dn:48201, nc:"+1.4%" },
@@ -796,6 +797,15 @@ let rawDailyHtml = [];
 
 const clr = (v) => v>0 ? 't-green' : 't-red';
 
+/* ── NSE DATE PARSER: handles "16-Mar-2026" cross-browser ── */
+function parseNSEDate(str) {
+  const M = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const p = (str || '').split('-');
+  if (p.length === 3 && M[p[1]] !== undefined)
+    return new Date(parseInt(p[2]), M[p[1]], parseInt(p[0]));
+  return null;
+}
+
 function renderDashboard() {
   const latest = dailyData[0];
   
@@ -836,9 +846,39 @@ function renderDashboard() {
   document.getElementById('lNet').innerText = fmt(net);
   document.getElementById('lNet').className = `num-s ${clr(net)}`;
   
-  let dtStr = new Date(latest.d).toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
-  if(dtStr === 'Invalid Date' || !dtStr) dtStr = latest.d;
+  const dt = parseNSEDate(latest.d);
+  let dtStr = dt ? dt.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) : latest.d;
   document.getElementById('lDate').innerText = dtStr;
+
+  // ── Dynamic Momentum Badge ──────────────────────────────────────────────────
+  const badge = document.getElementById('heroBadge');
+  if (badge) {
+    const fn = latest.fn;
+    let label, cls;
+    if      (fn <= -10000) { label = 'Aggressive Selling'; cls = 'mb-bear'; }
+    else if (fn <=  -3000) { label = 'Net Selling';        cls = 'mb-bear'; }
+    else if (fn <    3000) { label = 'Neutral';            cls = 'mb-neut'; }
+    else if (fn <   10000) { label = 'Net Buying';         cls = 'mb-bull'; }
+    else                   { label = 'Aggressive Buying';  cls = 'mb-bull'; }
+    badge.className = `mom-badge ${cls}`;
+    badge.innerText = label;
+  }
+
+  // ── Liquidity Drain / Injection Label ──────────────────────────────────────
+  const liqLbl = document.getElementById('liqLabel');
+  if (liqLbl) liqLbl.innerText = net < 0 ? 'Combined Liquidity Drain' : 'Net Liquidity Injection';
+
+  // ── 5-Day FII Velocity ─────────────────────────────────────────────────────
+  const last5 = dailyData.slice(0, 5);
+  const vel5  = last5.reduce((s, d) => s + d.fn, 0);
+  const avg5  = Math.round(vel5 / last5.length);
+  const vel5El   = document.getElementById('vel5d');
+  const vel5Desc = document.getElementById('vel5dDesc');
+  if (vel5El)   { vel5El.innerText = fmt(vel5); vel5El.className = `num-m ${clr(vel5)}`; }
+  if (vel5Desc) {
+    const side = avg5 < 0 ? 'selling' : 'buying';
+    vel5Desc.innerHTML = `Avg daily ${side}: <strong>${fmt(avg5)}/day</strong> over the last ${last5.length} sessions.`;
+  }
 
   // Render Flow Strength Meter
   const fNetAbs = Math.abs(dailyData[0].fn);
